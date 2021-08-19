@@ -95,89 +95,103 @@ class Turemit {
     this.rules = rules;
     this.field = field;
   }
+  #deadLock = false;
  
-  step() {
+  step(stepsCount) {
     var rule = this.rules.find(r => (r.startColor == this.field[this.y][this.x] && r.startState == this.state));
-    if(!rule) {
-      throw new Error(`No rule for field color ${this.field[this.y][this.x]}; state ${this.state}`);
+    if(this.#deadLock) {
+      if(!rule) {
+        return;
+      } else {
+        this.#deadLock = false;
+      }
     }
-    let newCoordinates = { x: this.x, y: this.y };
-    
-    this.field[this.y][this.x] = rule.newColor;
-    
-    switch(this.direction) {
-      case DIRECTIONS.UP:
-        if(rule.direction == -1) {
-          newCoordinates.x = newCoordinates.x - 1;
-          this.direction = DIRECTIONS.LEFT;
-        }
-        else if(rule.direction == 0) {
-          newCoordinates.y = newCoordinates.y - 1;
-        }
-        else if(rule.direction == 1) {
-          newCoordinates.x = newCoordinates.x + 1;
-          this.direction = DIRECTIONS.RIGHT;
-        }
-        else
+    for(var i = 0; i < stepsCount; i++) {
+      rule = this.rules.find(r => (r.startColor == this.field[this.y][this.x] && r.startState == this.state));
+      if(!rule) {
+        this.#deadLock = true;
+        //throw new Error
+        console.log(`No rule for field color ${this.field[this.y][this.x]}; state ${this.state}`);
+        return;
+      }
+      let newCoordinates = { x: this.x, y: this.y };
+
+      this.field[this.y][this.x] = rule.newColor;
+
+      switch(this.direction) {
+        case DIRECTIONS.UP:
+          if(rule.direction == -1) {
+            newCoordinates.x = newCoordinates.x - 1;
+            this.direction = DIRECTIONS.LEFT;
+          }
+          else if(rule.direction == 0) {
+            newCoordinates.y = newCoordinates.y - 1;
+          }
+          else if(rule.direction == 1) {
+            newCoordinates.x = newCoordinates.x + 1;
+            this.direction = DIRECTIONS.RIGHT;
+          }
+          else
+            throw new Error("Incorrect direction");
+          break;
+        case DIRECTIONS.DOWN:
+          if(rule.direction == -1) {
+            newCoordinates.x = newCoordinates.x + 1;
+            this.direction = DIRECTIONS.RIGHT;
+          }
+          else if(rule.direction == 0) {
+            newCoordinates.y = newCoordinates.y + 1;
+          }
+          else if(rule.direction == 1) {
+            newCoordinates.x = newCoordinates.x - 1;
+            this.direction = DIRECTIONS.LEFT;
+          }
+          else
+            throw new Error("Incorrect direction");
+          break;
+        case DIRECTIONS.RIGHT:
+          if(rule.direction == -1) {
+            newCoordinates.y = newCoordinates.y - 1;
+            this.direction = DIRECTIONS.UP;
+          }
+          else if(rule.direction == 0) {
+            newCoordinates.x = newCoordinates.x + 1;
+          }
+          else if(rule.direction == 1) {
+            newCoordinates.y = newCoordinates.y + 1;
+            this.direction = DIRECTIONS.DOWN;
+          }
+          else
+            throw new Error("Incorrect direction");
+          break;
+        case DIRECTIONS.LEFT:
+          if(rule.direction == -1) {
+            newCoordinates.y = newCoordinates.y + 1;
+            this.direction = DIRECTIONS.DOWN;
+          }
+          else if(rule.direction == 0) {
+            newCoordinates.x = newCoordinates.x - 1;
+          }
+          else if(rule.direction == 1) {
+            newCoordinates.y = newCoordinates.y - 1;
+            this.direction = DIRECTIONS.UP;
+          }
+          else
+            throw new Error("Incorrect direction");
+          break;
+        default:
           throw new Error("Incorrect direction");
-        break;
-      case DIRECTIONS.DOWN:
-        if(rule.direction == -1) {
-          newCoordinates.x = newCoordinates.x + 1;
-          this.direction = DIRECTIONS.RIGHT;
-        }
-        else if(rule.direction == 0) {
-          newCoordinates.y = newCoordinates.y + 1;
-        }
-        else if(rule.direction == 1) {
-          newCoordinates.x = newCoordinates.x - 1;
-          this.direction = DIRECTIONS.LEFT;
-        }
-        else
-          throw new Error("Incorrect direction");
-        break;
-      case DIRECTIONS.RIGHT:
-        if(rule.direction == -1) {
-          newCoordinates.y = newCoordinates.y - 1;
-          this.direction = DIRECTIONS.UP;
-        }
-        else if(rule.direction == 0) {
-          newCoordinates.x = newCoordinates.x + 1;
-        }
-        else if(rule.direction == 1) {
-          newCoordinates.y = newCoordinates.y + 1;
-          this.direction = DIRECTIONS.DOWN;
-        }
-        else
-          throw new Error("Incorrect direction");
-        break;
-      case DIRECTIONS.LEFT:
-        if(rule.direction == -1) {
-          newCoordinates.y = newCoordinates.y + 1;
-          this.direction = DIRECTIONS.DOWN;
-        }
-        else if(rule.direction == 0) {
-          newCoordinates.x = newCoordinates.x - 1;
-        }
-        else if(rule.direction == 1) {
-          newCoordinates.y = newCoordinates.y - 1;
-          this.direction = DIRECTIONS.UP;
-        }
-        else
-          throw new Error("Incorrect direction");
-        break;
-      default:
-        throw new Error("Incorrect direction");
+      }
+
+      if(newCoordinates.x > W_SIZE || newCoordinates.y > H_SIZE ||
+        newCoordinates.x < 0 || newCoordinates.y < 0) {
+        throw new Error("Out of field range");
+      }
+
+      this.state = rule.newState;
+      this.x = newCoordinates.x;
+      this.y = newCoordinates.y;
     }
-    
-    if(newCoordinates.x > W_SIZE || newCoordinates.y > H_SIZE ||
-      newCoordinates.x < 0 || newCoordinates.y < 0) {
-      throw new Error("Out of field range");
-    }
-    
-    this.state = rule.newState;
-    this.x = newCoordinates.x;
-    this.y = newCoordinates.y;
   }
   
   upColor() {
@@ -207,8 +221,8 @@ resetField();
 
 function draw() {
   CONTEXT.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  for(var x = 0; x < FIELD.lenght; x++) {
-    for(var y = 0; y < FIELD[x].lenght; y++) {
+  for(var x = 0; x < FIELD.length; x++) {
+    for(var y = 0; y < FIELD[x].length; y++) {
       drawSquare(y * GRID_SIZE, x * GRID_SIZE, GRID_SIZE, FIELD[x][y]);
     }
   }
@@ -250,9 +264,7 @@ document.addEventListener('keypress', e => {
   }
   
   for(t of TUREMITS) {
-    for(var i = 0; i < 100000; i++) {
-      t.step();
-    }
+    t.step(10000);
   }
   draw();
 });
