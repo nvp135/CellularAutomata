@@ -1,9 +1,9 @@
-const markup = `<canvas height="890" width="1880" class="canvas" id="canvas" />`;
+const markup = `<canvas height="${window.innerHeight - 20}" width="${window.innerWidth - 20}" class="canvas" id="canvas" />`;
 document.body.innerHTML = markup;
 
 const TUREMITS = [];
 
-const GRID_SIZE = 1;
+const GRID_SIZE = 5;
 const CANVAS = document.getElementById("canvas");
 const CANVAS_HEIGHT = CANVAS.height;
 const CANVAS_WIDTH = CANVAS.width;
@@ -183,9 +183,11 @@ class Turemit {
           throw new Error("Incorrect direction");
       }
 
-      if(newCoordinates.x > W_SIZE || newCoordinates.y > H_SIZE ||
+      if(newCoordinates.x >= W_SIZE || newCoordinates.y >= H_SIZE ||
         newCoordinates.x < 0 || newCoordinates.y < 0) {
-        throw new Error("Out of field range");
+        this.#deadLock = true;
+        return;
+          //throw new Error("Out of field range");
       }
 
       this.state = rule.newState;
