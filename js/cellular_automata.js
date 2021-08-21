@@ -95,10 +95,29 @@ class Turemit {
     this.rules = rules;
     this.field = field;
   }
+  
   #deadLock = false;
+
+  TorItX(x) {
+    if(x < 0)
+      return x + W_SIZE; 
+    if(x >= W_SIZE)
+      return 0; 
+    else 
+      return x % W_SIZE;
+  }
+
+  TorItY(y) {
+    if(y < 0)
+      return y + H_SIZE; 
+    if(y >= H_SIZE)
+      return 0; 
+    else 
+      return y % H_SIZE;
+  }
  
   step(stepsCount) {
-    var rule = this.rules.find(r => (r.startColor == this.field[this.y][this.x] && r.startState == this.state));
+    let rule = this.rules.find(r => (r.startColor == this.field[this.y][this.x] && r.startState == this.state));
     if(this.#deadLock) {
       if(!rule) {
         return;
@@ -106,7 +125,7 @@ class Turemit {
         this.#deadLock = false;
       }
     }
-    for(var i = 0; i < stepsCount; i++) {
+    for(let i = 0; i < stepsCount; i++) {
       rule = this.rules.find(r => (r.startColor == this.field[this.y][this.x] && r.startState == this.state));
       if(!rule) {
         this.#deadLock = true;
@@ -121,14 +140,14 @@ class Turemit {
       switch(this.direction) {
         case DIRECTIONS.UP:
           if(rule.direction == -1) {
-            newCoordinates.x = newCoordinates.x - 1;
+            newCoordinates.x = this.TorItX(newCoordinates.x - 1);
             this.direction = DIRECTIONS.LEFT;
           }
           else if(rule.direction == 0) {
-            newCoordinates.y = newCoordinates.y - 1;
+            newCoordinates.y = this.TorItY(newCoordinates.y - 1);
           }
           else if(rule.direction == 1) {
-            newCoordinates.x = newCoordinates.x + 1;
+            newCoordinates.x = this.TorItX(newCoordinates.x + 1);
             this.direction = DIRECTIONS.RIGHT;
           }
           else
@@ -136,14 +155,14 @@ class Turemit {
           break;
         case DIRECTIONS.DOWN:
           if(rule.direction == -1) {
-            newCoordinates.x = newCoordinates.x + 1;
+            newCoordinates.x = this.TorItX(newCoordinates.x + 1);
             this.direction = DIRECTIONS.RIGHT;
           }
           else if(rule.direction == 0) {
-            newCoordinates.y = newCoordinates.y + 1;
+            newCoordinates.y = this.TorItY(newCoordinates.y + 1);
           }
           else if(rule.direction == 1) {
-            newCoordinates.x = newCoordinates.x - 1;
+            newCoordinates.x = this.TorItX(newCoordinates.x - 1);
             this.direction = DIRECTIONS.LEFT;
           }
           else
@@ -151,14 +170,14 @@ class Turemit {
           break;
         case DIRECTIONS.RIGHT:
           if(rule.direction == -1) {
-            newCoordinates.y = newCoordinates.y - 1;
+            newCoordinates.y = this.TorItY(newCoordinates.y - 1);
             this.direction = DIRECTIONS.UP;
           }
           else if(rule.direction == 0) {
-            newCoordinates.x = newCoordinates.x + 1;
+            newCoordinates.x = this.TorItX(newCoordinates.x + 1);
           }
           else if(rule.direction == 1) {
-            newCoordinates.y = newCoordinates.y + 1;
+            newCoordinates.y = this.TorItY(newCoordinates.y + 1);
             this.direction = DIRECTIONS.DOWN;
           }
           else
@@ -166,14 +185,14 @@ class Turemit {
           break;
         case DIRECTIONS.LEFT:
           if(rule.direction == -1) {
-            newCoordinates.y = newCoordinates.y + 1;
+            newCoordinates.y = this.TorItY(newCoordinates.y + 1);
             this.direction = DIRECTIONS.DOWN;
           }
           else if(rule.direction == 0) {
-            newCoordinates.x = newCoordinates.x - 1;
+            newCoordinates.x = this.TorItX(newCoordinates.x - 1);
           }
           else if(rule.direction == 1) {
-            newCoordinates.y = newCoordinates.y - 1;
+            newCoordinates.y = this.TorItY(newCoordinates.y - 1);
             this.direction = DIRECTIONS.UP;
           }
           else
@@ -202,19 +221,19 @@ class Turemit {
 }
 
 function resetField() {
-  for(var i = 0; i < H_SIZE; i++) {
+  for(let i = 0; i < H_SIZE; i++) {
     FIELD.push(new Array(W_SIZE).fill(0));
   }
 }
 
 CONTEXT.lineWidth = 0.1;
 
-for(var i = 0; i < H_SIZE; i++) {
+for(let i = 0; i < H_SIZE; i++) {
   CONTEXT.moveTo(0, i * GRID_SIZE);
   CONTEXT.lineTo(CANVAS_WIDTH, i * GRID_SIZE);
 }
 
-for(var i = 0; i < W_SIZE; i++) {
+for(let i = 0; i < W_SIZE; i++) {
   CONTEXT.moveTo(i * GRID_SIZE, 0);
   CONTEXT.lineTo(i * GRID_SIZE, CANVAS_HEIGHT);
 }
@@ -223,8 +242,8 @@ resetField();
 
 function draw() {
   CONTEXT.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  for(var x = 0; x < FIELD.length; x++) {
-    for(var y = 0; y < FIELD[x].length; y++) {
+  for(let x = 0; x < FIELD.length; x++) {
+    for(let y = 0; y < FIELD[x].length; y++) {
       drawSquare(y * GRID_SIZE, x * GRID_SIZE, GRID_SIZE, FIELD[x][y]);
     }
   }
@@ -244,7 +263,7 @@ CANVAS.addEventListener('click', e => {
   
   let turemit;
   
-  for(var t of TUREMITS) {
+  for(let t of TUREMITS) {
     if(t.x == x && t.y == y) {
       turemit = t;
       break;
