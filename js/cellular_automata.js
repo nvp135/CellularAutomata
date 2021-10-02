@@ -1,12 +1,14 @@
-const markup = `<canvas height="${window.innerHeight - 20}" width="${window.innerWidth - 20}" class="canvas" id="canvas" />`;
+const CANVAS_HEIGHT = 2000;//window.innerHeight - 20;
+const CANVAS_WIDTH = 3000;//window.innerWidth - 20;
+
+const markup = `<canvas height="${CANVAS_HEIGHT}" width="${CANVAS_WIDTH}" class="canvas" id="canvas" />`;
 document.body.innerHTML = markup;
 
 const TUREMITS = [];
 
-const GRID_SIZE = 5;
+const GRID_SIZE = 1;
 const CANVAS = document.getElementById("canvas");
-const CANVAS_HEIGHT = CANVAS.height;
-const CANVAS_WIDTH = CANVAS.width;
+
 const H_SIZE = Math.floor(CANVAS_HEIGHT / GRID_SIZE);
 const W_SIZE = Math.floor(CANVAS_WIDTH / GRID_SIZE);
 const CONTEXT = CANVAS.getContext("2d");
@@ -15,6 +17,8 @@ const COLORS = ["black","maroon","green","olive",
                 "navy","purple","teal","silver",
                 "gray","red","lime","yellow",
                 "blue","fuchsia","aqua","white",];
+
+const STEPS_COUNT = 1000000;
 
 const DIRECTIONS = Object.freeze({UP: 1, RIGHT:2, DOWN:3, LEFT:4});
 
@@ -273,7 +277,8 @@ CANVAS.addEventListener('click', e => {
   if(turemit) {
     turemit.upColor();
   } else {
-    t = new Turemit(FIELD, x, y, DIRECTIONS.UP, "A", ISLAND);
+    //t = new Turemit(FIELD, x, y, DIRECTIONS.UP, "A", ISLAND);
+    t = new Turemit(FIELD, x, y, DIRECTIONS.UP, "A", SPINNER);
     TUREMITS.push(t);
   }
   draw();
@@ -285,7 +290,7 @@ document.addEventListener('keypress', e => {
   }
   
   for(t of TUREMITS) {
-    t.step(10000);
+    t.step(STEPS_COUNT);
   }
   draw();
 });

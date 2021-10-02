@@ -1,10 +1,11 @@
-const markup = `<canvas height="${window.innerHeight - 20}" width="${window.innerWidth - 20}" class="canvas" id="canvas" />`;
+const CANVAS_HEIGHT = window.innerHeight - 20;
+const CANVAS_WIDTH = window.innerWidth - 20;
+
+const markup = `<canvas height="${CANVAS_HEIGHT}" width="${CANVAS_WIDTH}" class="canvas" id="canvas" />`;
 document.body.innerHTML = markup;
 
-const GRID_SIZE = 15;
+const GRID_SIZE = 5;
 const CANVAS = document.getElementById("canvas");
-const CANVAS_HEIGHT = CANVAS.height;
-const CANVAS_WIDTH = CANVAS.width;
 const H_SIZE = Math.floor(CANVAS_HEIGHT / GRID_SIZE);
 const W_SIZE = Math.floor(CANVAS_WIDTH / GRID_SIZE);
 const CONTEXT = CANVAS.getContext("2d");
@@ -281,14 +282,18 @@ function checkElectronsAround(x, y) {
 let timerId;
 
 document.addEventListener('keypress', e => {
-  if(e.code != "Space") {
-    return;
-  }
-  if(timerId) {
-    clearInterval(timerId);
-    timerId = undefined;
-  } else {
-    timerId = setInterval(() => run(), 100);
+  switch (e.code) {
+    case "KeyS":
+      if(timerId) {
+        clearInterval(timerId);
+        timerId = undefined;
+      } else {
+        timerId = setInterval(() => run(), 100);
+      }
+      break;
+  
+    default:
+      break;
   }
   draw();
 });
