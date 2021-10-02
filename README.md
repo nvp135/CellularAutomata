@@ -1,1 +1,1 @@
-# CellularAutomata
+# Some experiments with JS Canvas
