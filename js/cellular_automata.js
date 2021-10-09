@@ -1,12 +1,15 @@
-const CANVAS_HEIGHT = 2000;//window.innerHeight - 20;
-const CANVAS_WIDTH = 3000;//window.innerWidth - 20;
+const CANVAS_HEIGHT = 1000;//window.innerHeight - 20;
+const CANVAS_WIDTH = 1900;//window.innerWidth - 20;
 
-const markup = `<canvas height="${CANVAS_HEIGHT}" width="${CANVAS_WIDTH}" class="canvas" id="canvas" />`;
+const markup = `<select id="choice"></select><br>
+<canvas height="${CANVAS_HEIGHT}" width="${CANVAS_WIDTH}" class="canvas" id="canvas" />`;
 document.body.innerHTML = markup;
+
+const TUREMITS_LIST = {};
 
 const TUREMITS = [];
 
-const GRID_SIZE = 1;
+const GRID_SIZE = 3;
 const CANVAS = document.getElementById("canvas");
 
 const H_SIZE = Math.floor(CANVAS_HEIGHT / GRID_SIZE);
@@ -24,7 +27,7 @@ const DIRECTIONS = Object.freeze({UP: 1, RIGHT:2, DOWN:3, LEFT:4});
 
 const FIELD = [];
 
-const ISLAND = [
+TUREMITS_LIST["ISLAND"] = [
   { startState: "A", startColor: 0, newColor: 1, direction: -1, newState: "B" },
   { startState: "A", startColor: 1, newColor: 2, direction: -1, newState: "B" },
   { startState: "A", startColor: 2, newColor: 3, direction: -1, newState: "B" },
@@ -59,28 +62,28 @@ const ISLAND = [
   { startState: "B", startColor: 15, newColor: 0, direction: -1, newState: "A" },
 ];
 
-const LABYRINTH = [
-{ startState: "A", startColor: 0, newColor: 1, direction: -1, newState: "A" },
-{ startState: "A", startColor: 1, newColor: 2, direction: -1, newState: "A" },
-{ startState: "A", startColor: 2, newColor: 3, direction: -1, newState: "A" },
-{ startState: "A", startColor: 3, newColor: 4, direction: -1, newState: "A" },
-{ startState: "A", startColor: 4, newColor: 5, direction: -1, newState: "A" },
-{ startState: "A", startColor: 5, newColor: 6, direction: 1, newState: "B" },
-{ startState: "B", startColor: 0, newColor: 1, direction: 1, newState: "A" },
-{ startState: "B", startColor: 5, newColor: 6, direction: -1, newState: "B" },
-{ startState: "B", startColor: 6, newColor: 7, direction: -1, newState: "B" },
-{ startState: "B", startColor: 7, newColor: 8, direction: -1, newState: "B" },
-{ startState: "B", startColor: 8, newColor: 9, direction: -1, newState: "B" },
-{ startState: "B", startColor: 9, newColor: 10, direction: -1, newState: "B" },
-{ startState: "B", startColor: 10, newColor: 11, direction: -1, newState: "B" },
-{ startState: "B", startColor: 11, newColor: 12, direction: -1, newState: "B" },
-{ startState: "B", startColor: 12, newColor: 13, direction: -1, newState: "B" },
-{ startState: "B", startColor: 13, newColor: 14, direction: -1, newState: "B" },
-{ startState: "B", startColor: 14, newColor: 15, direction: -1, newState: "B" },
-{ startState: "B", startColor: 15, newColor: 0, direction: -1, newState: "B" },
+TUREMITS_LIST["LABYRINTH"] = [
+  { startState: "A", startColor: 0, newColor: 1, direction: -1, newState: "A" },
+  { startState: "A", startColor: 1, newColor: 2, direction: -1, newState: "A" },
+  { startState: "A", startColor: 2, newColor: 3, direction: -1, newState: "A" },
+  { startState: "A", startColor: 3, newColor: 4, direction: -1, newState: "A" },
+  { startState: "A", startColor: 4, newColor: 5, direction: -1, newState: "A" },
+  { startState: "A", startColor: 5, newColor: 6, direction: 1, newState: "B" },
+  { startState: "B", startColor: 0, newColor: 1, direction: 1, newState: "A" },
+  { startState: "B", startColor: 5, newColor: 6, direction: -1, newState: "B" },
+  { startState: "B", startColor: 6, newColor: 7, direction: -1, newState: "B" },
+  { startState: "B", startColor: 7, newColor: 8, direction: -1, newState: "B" },
+  { startState: "B", startColor: 8, newColor: 9, direction: -1, newState: "B" },
+  { startState: "B", startColor: 9, newColor: 10, direction: -1, newState: "B" },
+  { startState: "B", startColor: 10, newColor: 11, direction: -1, newState: "B" },
+  { startState: "B", startColor: 11, newColor: 12, direction: -1, newState: "B" },
+  { startState: "B", startColor: 12, newColor: 13, direction: -1, newState: "B" },
+  { startState: "B", startColor: 13, newColor: 14, direction: -1, newState: "B" },
+  { startState: "B", startColor: 14, newColor: 15, direction: -1, newState: "B" },
+  { startState: "B", startColor: 15, newColor: 0, direction: -1, newState: "B" },
 ];
 
-const SPINNER = [
+TUREMITS_LIST["SPINNER"] = [
   { startState: "A", startColor: 0, newColor: 2, direction: 0, newState: "C" },
   { startState: "A", startColor: 2, newColor: 0, direction: 0, newState: "B" },
   { startState: "B", startColor: 2, newColor: 2, direction: 1, newState: "A" },
@@ -89,6 +92,15 @@ const SPINNER = [
   { startState: "C", startColor: 0, newColor: 15, direction: -1, newState: "A" },
   { startState: "C", startColor: 15, newColor: 2, direction: -1, newState: "A" },
 ];
+
+const SELECT = document.getElementById("choice");
+
+Object.keys(TUREMITS_LIST).forEach(k => {
+  var opt = document.createElement('option');
+  opt.value = k;
+  opt.innerHTML = k;
+  SELECT.appendChild(opt);
+});
 
 class Turemit {
   constructor(field, x, y, direction, state, rules) {
@@ -277,8 +289,7 @@ CANVAS.addEventListener('click', e => {
   if(turemit) {
     turemit.upColor();
   } else {
-    //t = new Turemit(FIELD, x, y, DIRECTIONS.UP, "A", ISLAND);
-    t = new Turemit(FIELD, x, y, DIRECTIONS.UP, "A", SPINNER);
+    t = new Turemit(FIELD, x, y, DIRECTIONS.UP, "A", TUREMITS_LIST[SELECT.value]);
     TUREMITS.push(t);
   }
   draw();
